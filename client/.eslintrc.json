@@ -1,0 +1,12 @@
+{
+  "extends": ["next/core-web-vitals", "next/typescript"],
+  "rules": {
+    "@typescript-eslint/no-unused-vars": [
+      "warn", // Use 'warn' instead of 'error' to avoid build failures
+      {
+        "argsIgnorePattern": "^_", // Ignore unused function parameters with underscore
+        "varsIgnorePattern": "^_"  // Ignore unused variables with underscore prefix
+      }
+    ]
+  }
+}
