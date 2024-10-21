@@ -1,0 +1,69 @@
+org: awsserver1
+service: aws-server
+
+provider:
+  name: aws
+  runtime: nodejs20.x
+  region : ap-south-1
+  environment:
+    MONGODB_URI: "mongodb+srv://karthikeyakollu:0oQhNNRxWPKAxmGk@cluster0.p2bgc.mongodb.net/mydb?retryWrites=true&w=majority&appName=Cluster0" # Use an environment variable
+
+functions:
+  usersCreate:
+    handler: handlers/users.createUser
+    events:
+      - httpApi:
+          path: /users
+          method: post
+
+  usersRead:
+    handler: handlers/users.getUsers
+    events:
+      - httpApi:
+          path: /users
+          method: get
+
+  usersUpdate:
+    handler: handlers/users.updateUser
+    events:
+      - httpApi:
+          path: /users/{id}
+          method: put
+
+  usersDelete:
+    handler: handlers/users.deleteUser
+    events:
+      - httpApi:
+          path: /users/{id}
+          method: delete
+
+  expensesCreate:
+    handler: handlers/expenses.createExpense
+    events:
+      - httpApi:
+          path: /expenses
+          method: post
+
+  expensesRead:
+    handler: handlers/expenses.getExpenses
+    events:
+      - httpApi:
+          path: /expenses/{id}
+          method: get
+
+  expensesUpdate:
+    handler: handlers/expenses.updateExpense
+    events:
+      - httpApi:
+          path: /update-expenses/{id}
+          method: put
+
+  expensesDelete:
+    handler: handlers/expenses.deleteExpense
+    events:
+      - httpApi:
+          path: /expenses/{id}
+          method: delete
+
+plugins:
+  - serverless-offline
