@@ -67,8 +67,8 @@ const TransactionList: React.FC = () => {
         const resultAction = await dispatch(fetchTransactions({
           userId: 'user_2nmuwjdJoMdWIlhRu6Xf5z34fB2',
           category: selectedCategory,
-          subcategory:selectedSubcategory,
-          token : token
+          subcategory: selectedSubcategory,
+          token: token
         }));
         if (fetchTransactions.fulfilled.match(resultAction)) {
           // Success handling
@@ -79,8 +79,8 @@ const TransactionList: React.FC = () => {
         console.error("User ID is not available");
       }
     };
-   handleFetchTransactions();
-  }, [dispatch, userId,selectedCategory,selectedSubcategory]);
+    handleFetchTransactions();
+  }, [dispatch, userId, selectedCategory, selectedSubcategory]);
 
   // Helper function to format the date
   const formatTransactionDate = (dateString: string) => {

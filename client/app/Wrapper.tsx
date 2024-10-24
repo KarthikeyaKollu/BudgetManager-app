@@ -8,32 +8,6 @@ import { Provider } from 'react-redux';
 import store from "@/redux/store";
 
 
-export const weeklyChartData = [
-  {
-    date: "5th Mar",
-    values: [1780, 800, 980],
-  },
-  {
-    date: "6th Mar",
-    values: [499, 199, 300],
-  },
-  {
-    date: "7th Mar",
-    values: [1780, 800, 980],
-  },
-  {
-    date: "8th Mar",
-    values: [1780, 800, 980],
-  },
-  {
-    date: "9th Mar",
-    values: [1780, 800, 980],
-  },
-  {
-    date: "Yesterday",
-    values: [], // Provide an empty array for consistency.
-  },
-];
 
 
 export default function Wrapper() {
