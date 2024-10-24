@@ -1,4 +1,12 @@
-const host = process.env.NEXT_PUBLIC_HOST_API
+const host = process.env.NEXT_PUBLIC_HOST_API;
+
+// Utility functions for encoding and decoding
+const encodeToken = (userId) => {
+  return btoa(userId); // Encode to Base64
+};
+
+
+
 export async function createUser(userData) {
   try {
     const response = await fetch(`${host}/users`, {
@@ -18,9 +26,13 @@ export async function createUser(userData) {
   }
 }
 
-export async function getUsers() {
+export async function getUsers(userId) {
   try {
-    const response = await fetch(`${host}/users`);
+    const response = await fetch(`${host}/users`, {
+      headers: {
+        'Authorization': `Bearer ${encodeToken(userId)}`, // Add encoded user ID to headers
+      },
+    });
 
     if (!response.ok) throw new Error('Failed to fetch users');
 
@@ -31,12 +43,13 @@ export async function getUsers() {
   }
 }
 
-export async function updateUser(userId, updatedData) {
+export async function updateUser(userId) {
   try {
     const response = await fetch(`${host}/users/${userId}`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
+        'Authorization': `Bearer ${encodeToken(userId)}`, // Add encoded user ID to headers
       },
       body: JSON.stringify(updatedData),
     });
@@ -54,6 +67,9 @@ export async function deleteUser(userId) {
   try {
     const response = await fetch(`${host}/users/${userId}`, {
       method: 'DELETE',
+      headers: {
+        'Authorization': `Bearer ${encodeToken(userId)}`, // Add encoded user ID to headers
+      },
     });
 
     if (!response.ok) throw new Error('Failed to delete user');
@@ -65,7 +81,11 @@ export async function deleteUser(userId) {
 
 export async function getUserById(userId) {
   try {
-    const response = await fetch(`${host}/users/${userId}`);
+    const response = await fetch(`${host}/users/${userId}`, {
+      headers: {
+        'Authorization': `Bearer ${encodeToken(userId)}`, // Add encoded user ID to headers
+      },
+    });
 
     if (!response.ok) throw new Error('Failed to fetch user');
 
