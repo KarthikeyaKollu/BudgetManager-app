@@ -12,7 +12,6 @@ export async function createUser(userData) {
     if (!response.ok) throw new Error('Failed to create user');
 
     const data = await response.json();
-    console.log('User created:', data);
     return data;
   } catch (error) {
     console.error('Error:', error);
@@ -26,7 +25,6 @@ export async function getUsers() {
     if (!response.ok) throw new Error('Failed to fetch users');
 
     const data = await response.json();
-    console.log('Users:', data);
     return data;
   } catch (error) {
     console.error('Error:', error);
@@ -46,7 +44,6 @@ export async function updateUser(userId, updatedData) {
     if (!response.ok) throw new Error('Failed to update user');
 
     const data = await response.json();
-    console.log('User updated:', data);
     return data;
   } catch (error) {
     console.error('Error:', error);
@@ -61,7 +58,6 @@ export async function deleteUser(userId) {
 
     if (!response.ok) throw new Error('Failed to delete user');
 
-    console.log(`User with ID ${userId} deleted`);
   } catch (error) {
     console.error('Error:', error);
   }
@@ -74,7 +70,6 @@ export async function getUserById(userId) {
     if (!response.ok) throw new Error('Failed to fetch user');
 
     const data = await response.json();
-    console.log('User data:', data);
     return data;
   } catch (error) {
     console.error('Error:', error);

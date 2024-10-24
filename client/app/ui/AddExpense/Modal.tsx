@@ -36,7 +36,6 @@ const categories = [
 const Modal = ({ onClose }) => {
 
   const { user } = useUser(); // Use useUser hook to get the user object
-  console.log(user?.id)
   const [formData, setFormData] = useState({
     what: '',
     amount: '',
@@ -61,8 +60,6 @@ const Modal = ({ onClose }) => {
   };
 
   const handleSubmit = async () => {
-    console.log('Form Data:', { ...formData, clerkId: user?.id });
-
     try {
       await postExpense({ ...formData, clerkId: user?.id }); // Await the postExpense call
       alert("Successfully added"); // Correct the spelling
@@ -94,7 +91,6 @@ const Modal = ({ onClose }) => {
       }
 
       const result = await response.json();
-      console.log('Expense added successfully:', result);
       return result;
     } catch (error) {
       console.error('Failed to add expense:', error.message);
@@ -103,14 +99,14 @@ const Modal = ({ onClose }) => {
 
 
   return (
-    <div className="w-[414px] h-[562px] bg-white rounded-2xl shadow p-5 relative">
+    <div className="w-[414px] h-[562px] bg-white rounded-[16px] shadow px-[45px] space-y-[16px] relative flex flex-col  justify-center">
       <button
         className="absolute top-2 right-2"
         onClick={onClose}
       >
         ✖️
       </button>
-      <div className="text-black text-2xl font-medium mb-5">New Expense</div>
+      <div className="text-black text-[24px] font-semibold mb-5">New Expense</div>
 
       <div className="mb-4">
         <label className="text-[#606060] text-xs font-medium">What did you spend on?</label>

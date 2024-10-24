@@ -10,13 +10,13 @@ const MonthlyExpenseCard = ({summary}) => {
     ];
 
     return (
-        <div className="w-[654px] h-[355px]  p-6  bg-white rounded-[16px] shadow-[0_4px_16px_rgba(0,0,0,0.1)]">
+        <div className="w-[654px] h-[355px]  p-3  bg-white rounded-[16px] shadow-[0_4px_16px_rgba(0,0,0,0.1)]">
             {/* Header */}
             <div className="text-lg font-bold text-black mb-4 ">This month</div>
 
             <div className="flex   items-center gap-[74px] justify-center">
                 {/* Main Component and Circles Section */}
-                <div className="relative  flex justify-center items-center">
+                <div className="relative">
                    
                         <PieChartComponent percentages={[summary.essentialPercent,summary. nonEssentialPercent,summary.miscellaneousPercent]} />
 

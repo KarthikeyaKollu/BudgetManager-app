@@ -5,15 +5,12 @@ export default authMiddleware({
   publicRoutes: ['/', '/api/webhooks/clerk', '/api/webhooks/stripe'],
 });
 
+
 export const config = {
   matcher: [
-    /*
-      Ensure middleware applies to:
-      - All routes except static files (like .js, .css, .png)
-      - Everything under `/api` and `/trpc`
-    */
-    "/((?!.*\\.[\\w]+$|_next).*)", 
-    "/", 
-    "/(api|trpc)(.*)"
+    // Skip Next.js internals and all static files, unless found in search params
+    '/((?!_next|[^?]*\\.(?:html?|css|js(?!on)|jpe?g|webp|png|gif|svg|ttf|woff2?|ico|csv|docx?|xlsx?|zip|webmanifest)).*)',
+    // Always run for API routes
+    '/(api|trpc)(.*)',
   ],
-};
+}

@@ -4,6 +4,8 @@ import { fetchTransactions } from "@/redux/transactionSlice";
 import { RootState, AppDispatch } from "@/redux/store";
 import { useSelector, useDispatch } from "react-redux";
 import { useUser } from "@clerk/nextjs";
+import { useSession } from '@clerk/nextjs'
+
 interface Transaction {
   _id: string;
   what: string;
@@ -47,12 +49,11 @@ const categories = [
 ];
 
 const TransactionList: React.FC = () => {
-
   const [selectedCategory, setSelectedCategory] = useState<string>("All");
   const [selectedSubcategory, setSelectedSubcategory] = useState<string>("All");
-   const [state, setState] = useState('loading')
   const { user } = useUser(); // Use useUser hook to get the user object
   const userId = user?.id;
+  const { session } = useSession();
 
   const dispatch = useDispatch<AppDispatch>();
   const { items: transactions, loading, error } = useSelector(
@@ -61,24 +62,25 @@ const TransactionList: React.FC = () => {
 
   useEffect(() => {
     const handleFetchTransactions = async () => {
+      const token = await session?.getToken();
       if (userId) {
-        const resultAction = await dispatch(fetchTransactions(userId)); // Dispatch with userId
-
-        // Check if the action was successful
+        const resultAction = await dispatch(fetchTransactions({
+          userId: 'user_2nmuwjdJoMdWIlhRu6Xf5z34fB2',
+          category: selectedCategory,
+          subcategory:selectedSubcategory,
+          token : token
+        }));
         if (fetchTransactions.fulfilled.match(resultAction)) {
-            
+          // Success handling
         } else {
-          // alert('Failed to fetch transactions.');
+          console.error("Failed to fetch transactions.");
         }
       } else {
         console.error("User ID is not available");
       }
     };
-
-   
-
-    handleFetchTransactions();
-  }, [dispatch, userId]);
+   handleFetchTransactions();
+  }, [dispatch, userId,selectedCategory,selectedSubcategory]);
 
   // Helper function to format the date
   const formatTransactionDate = (dateString: string) => {
@@ -87,10 +89,8 @@ const TransactionList: React.FC = () => {
     const yesterday = new Date(today);
     yesterday.setDate(today.getDate() - 1);
 
-    const isToday =
-      transactionDate.toDateString() === today.toDateString();
-    const isYesterday =
-      transactionDate.toDateString() === yesterday.toDateString();
+    const isToday = transactionDate.toDateString() === today.toDateString();
+    const isYesterday = transactionDate.toDateString() === yesterday.toDateString();
 
     if (isToday) return "Today";
     if (isYesterday) return "Yesterday";
@@ -99,18 +99,15 @@ const TransactionList: React.FC = () => {
       day: "numeric",
       month: "short",
     };
-
     return transactionDate.toLocaleDateString("en-US", options);
   };
 
-  const filteredTransactions = useMemo(() => {
-    // Check if transactions is an array and has elements
-    if (!Array.isArray(transactions) || transactions.length === 0) {
+  // Filter and group transactions by date
+  const groupedTransactions = useMemo(() => {
+    if (!Array.isArray(transactions) || transactions.length === 0) return {};
 
-      return []; // Return an empty array if transactions is not an array or is empty
-    }
-
-    return transactions.filter((transaction) => {
+    // Filter transactions based on selected category and subcategory
+    const filtered = transactions.filter((transaction) => {
       if (selectedCategory !== "All" && selectedSubcategory === "All") {
         return categories
           .find((cat) => cat.category === selectedCategory)
@@ -121,6 +118,19 @@ const TransactionList: React.FC = () => {
       }
       return true;
     });
+
+    // Sort transactions by date (newest first)
+    const sorted = filtered.sort(
+      (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+    );
+
+    // Group transactions by formatted date
+    return sorted.reduce((acc, transaction) => {
+      const date = formatTransactionDate(transaction.createdAt);
+      if (!acc[date]) acc[date] = [];
+      acc[date].push(transaction);
+      return acc;
+    }, {} as Record<string, Transaction[]>);
   }, [transactions, selectedCategory, selectedSubcategory]);
 
   const handleCategoryClick = (category: string) => {
@@ -128,12 +138,12 @@ const TransactionList: React.FC = () => {
     setSelectedSubcategory("All");
   };
 
-  if (loading){  return <p>Loading transactions...</p>};
+  if (loading) return <p>Loading transactions...</p>;
   if (error) return <p>Error: {error}</p>;
 
   return (
     <main>
-      <section className="max-w-[414px] h-[1051px] bg-white rounded-[16px] shadow-[0_4px_16px_rgba(0,0,0,0.1)] p-[22.5px]">
+      <section className="max-w-[414px] h-[1051px] bg-white rounded-[16px] shadow-[0_4px_16px_rgba(0,0,0,0.1)] p-[22.5px] overflow-y-auto scrollbar-hide">
         <header className="flex justify-between items-center mb-5">
           <h1 className="text-black text-lg font-bold">Transactions</h1>
           <select
@@ -164,34 +174,31 @@ const TransactionList: React.FC = () => {
           ))}
         </div>
 
-       {   <div className="overflow-y-auto max-h-[600px]">
+        <div className="overflow-y-auto max-h-[1000px] scrollbar-hide">
           <ul>
-            {filteredTransactions.map((transaction, index) => (
-              <li key={transaction._id} className="mb-6">
-                {index === 0 ||
-                  formatTransactionDate(filteredTransactions[index - 1].createdAt) !==
-                  formatTransactionDate(transaction.createdAt) ? (
-                  <p className="text-[#6f6f6f] text-sm font-normal mb-[20px]">
-                    {formatTransactionDate(transaction.createdAt)}
-                  </p>
-                ) : null}
-
-                <div className="flex items-center gap-4 w-full mb-[20px]">
-                  <span className="text-4xl">
-                    {categories
-                      .flatMap((cat) => cat.subcategories)
-                      .find((sub) => sub.name === transaction.subcategory)?.icon || "💼"}
-                  </span>
-                  <div className="flex-1">
-                    <p className="text-black text-base font-medium">{transaction.what}</p>
-                    <p className="text-[#6f6f6f] text-xs font-normal">{transaction.subcategory}</p>
+            {Object.entries(groupedTransactions).map(([date, transactions]) => (
+              <li key={date} className="mb-6">
+                <p className="text-[#6f6f6f] text-sm font-normal mb-[20px]">{date}</p>
+                {transactions.map((transaction) => (
+                  <div key={transaction._id} className="flex items-center gap-4 w-full mb-[20px]">
+                    <span className="text-4xl">
+                      {categories
+                        .flatMap((cat) => cat.subcategories)
+                        .find((sub) => sub.name === transaction.subcategory)?.icon || "💼"}
+                    </span>
+                    <div className="flex-1">
+                      <p className="text-black text-base font-medium">{transaction.what}</p>
+                      <p className="text-[#6f6f6f] text-xs font-normal">{transaction.subcategory}</p>
+                    </div>
+                    <p className="text-[#6f6f6f] text-base font-normal">-₹{transaction.amount.toFixed(2)}</p>
                   </div>
-                  <p className="text-[#6f6f6f] text-base font-normal">-₹{transaction.amount.toFixed(2)}</p>
-                </div>
+                ))}
               </li>
             ))}
           </ul>
-        </div>}
+        </div>
+
+
       </section>
     </main>
   );

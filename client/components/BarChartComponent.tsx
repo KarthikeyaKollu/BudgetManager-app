@@ -1,26 +1,14 @@
-"use client"
+"use client";
 
-import * as React from "react"
-import { Bar, BarChart, CartesianGrid, XAxis, YAxis, Tooltip, ResponsiveContainer } from "recharts"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-
-
-
-const data = [
-  { date: "5th Mar", lower: 550, upper: 300, extra: 480, total: 356 },
-  { date: "6th Mar", lower: 300, upper: 199, extra: 320, total: 998 },
-  { date: "7th Mar", lower: 580, upper: 800, extra: 1780, total: 3560 },
-  { date: "8th Mar", lower: 500, upper: 800, extra: 1780, total: 356 },
-  { date: "9th Mar", lower: 980, upper: 800, extra: 1780, total: 356 },
-  { date: "Yesterday", lower: 0, upper: 0, extra: 0, total: 10 },
-  { date: "Today", lower: 800, upper: 600, extra: 180, total: 356 },
-]
+import * as React from "react";
+import { Bar, BarChart, CartesianGrid, XAxis, YAxis, Tooltip, ResponsiveContainer } from "recharts";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
 
 // Custom label for displaying values inside bars
 const CustomBarLabel = ({ x, y, width, height, value }) => (
   <text
     x={x + width / 2}
-    y={y + height / 2}
+    y={height === 0 ? y - 10 : y + height / 2} // Show label above bar if height is 0
     fill="black"
     textAnchor="middle"
     dominantBaseline="central"
@@ -29,13 +17,13 @@ const CustomBarLabel = ({ x, y, width, height, value }) => (
   >
     ₹{value}
   </text>
-)
+);
 
 // Custom label to display total above each bar
 const TotalLabel = ({ x, y, total }) => (
   <text
     x={x}
-    y={y} // Adjust to show the label directly above the bar
+    y={y}
     textAnchor="middle"
     fill="black"
     fontSize="14"
@@ -43,7 +31,7 @@ const TotalLabel = ({ x, y, total }) => (
   >
     ₹{total}
   </text>
-)
+);
 
 // Tooltip for displaying detailed values
 const CustomTooltip = ({ active, payload, label }) => {
@@ -57,71 +45,65 @@ const CustomTooltip = ({ active, payload, label }) => {
           </p>
         ))}
       </div>
-    )
+    );
   }
-  return null
+  return null;
 }
-const COLORS = ["#27AE60", "#f2c94c", "#bfc5d4"]
 
-export default function BarChartComponent() {
+const COLORS = ["#27AE60", "#f2c94c", "#bfc5d4"]; // Colors for the categories
+
+export default function BarChartComponent({ data }) {
   return (
-    <Card className="w-[654px] h-[632px]  bg-white rounded-[16px] shadow-[0_4px_16px_rgba(0,0,0,0.1)]">
+    <Card className="w-[654px] h-[632px] bg-white rounded-[16px] shadow-[0_4px_16px_rgba(0,0,0,0.1)]">
       <CardHeader>
-        <p className="font-bold text-lg">Last week</p>
+        <p className="font-bold text-lg">Last Week</p>
       </CardHeader>
       <CardContent>
         <ResponsiveContainer width="100%" height={550}>
-
           <BarChart data={data} margin={{ top: 40, right: 0, left: 0, bottom: 0 }} barSize={53}>
             <CartesianGrid strokeDasharray="3 3" vertical={false} />
             <XAxis
               dataKey="date"
-              // axisLine={{ stroke: '#94A3B8' }}
               tick={{ fill: '#94A3B8', fontSize: 12 }}
-              // tickMargin={18}
               interval={0}
               padding={{ right: 20 }} // Extra space between "Yesterday" and "Today"
-
             />
             <YAxis
               tickFormatter={(value) => `₹${value}`}
-              // axisLine={{ stroke: '#94A3B8' }}
               tick={{ fill: '#94A3B8', fontSize: 12 }}
-              // tickMargin={10}
               interval={0}
             />
             <Tooltip content={<CustomTooltip />} cursor={{ fill: 'rgba(0, 0, 0, 0.1)' }} />
 
             {data.map((entry, index) => {
-              const totalHeight = entry.lower + entry.upper + entry.extra;
-              // Calculate the Y position for total labels
+              const totalHeight = entry.essential + entry.nonEssential + entry.miscellaneous;
               const yPosition = totalHeight > 0 ? 550 - (totalHeight / 10) - 10 : 550 - 10; // Add padding when totalHeight is 0
               return (
                 <TotalLabel
                   key={`total-${index}`}
                   x={index * 80 + 55} // Center the label above the bar
                   y={yPosition} // Adjusted Y position based on total height
-                  total={entry.total}
+                  total={totalHeight} // Pass the total height as the label
                 />
               );
             })}
 
             <Bar
-              dataKey="lower"
+              dataKey="essential"
               stackId="a"
               fill={COLORS[0]}
               radius={[0, 0, 0, 0]}
               label={<CustomBarLabel />}
             />
             <Bar
-              dataKey="upper"
+              dataKey="nonEssential"
               stackId="a"
               fill={COLORS[1]}
               radius={[0, 0, 0, 0]}
               label={<CustomBarLabel />}
             />
             <Bar
-              dataKey="extra"
+              dataKey="miscellaneous"
               stackId="a"
               fill={COLORS[2]}
               radius={[4, 4, 0, 0]}
