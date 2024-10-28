@@ -48,6 +48,48 @@ module.exports.getExpenses = async (event) => {
   }
 };
 
+
+
+// pagination 
+
+/* 
+
+limt = 20
+skip = (page-1) * limit 
+
+                  1-1 * 20 = 0
+
+                  2-1 * 20 = 20
+
+                  3-1 * 20 = 40
+
+                  pages 1- 20 , 21-40
+
+skip(skip).limit(limit)
+
+
+*/
+
+
+
+//filter  by cata, by day
+
+/*
+
+  select sum(price), catageroy, day  as totalAmt 
+  from the
+     expenses
+
+  groupby
+   catageroty, date(created_At)
+
+  order by 
+  day,catageroy
+
+*/
+
+
+
 // UPDATE Expense
 module.exports.updateExpense = async (event) => {
   await connectDB(); // Ensure DB connection
