@@ -76,15 +76,15 @@ skip(skip).limit(limit)
 
 /*
 
-  select sum(price) as totalAmt , catageroy, day  
+  select sum(price) as totalAmt , Category, day  
   from the
      expenses
 
   groupby
-   catageroty, date(created_At)
+   Category, date(created_At)
 
   order by 
-  day,catageroy
+  day, category
 
 */
 
