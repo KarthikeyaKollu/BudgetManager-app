@@ -76,7 +76,7 @@ skip(skip).limit(limit)
 
 /*
 
-  select sum(price), catageroy, day  as totalAmt 
+  select sum(price) as totalAmt , catageroy, day  
   from the
      expenses
 
